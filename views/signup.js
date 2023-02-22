@@ -13,6 +13,7 @@ async function addUser(e){
         email,
         password
     }
+    console.log(my_obj)
 
-    let res=await axios.post('http://localhost:4000/user/signup', my_obj)
+    await axios.post('http://localhost:4000/user/signup', my_obj)
 }
