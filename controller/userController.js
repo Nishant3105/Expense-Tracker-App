@@ -36,7 +36,7 @@ exports.userLogin=async (req,res,next)=>{
                     res.json('user logged in succesfully!')
                 }
                 else{
-                    res.json('incorrect password')
+                    res.status(401).json('User not authorized')
                 }
             }
             else{
