@@ -20,3 +20,33 @@ exports.postUser=async (req,res,next)=>{
         console.log(err)
     }
 }
+
+exports.userLogin=async (req,res,next)=>{
+    try{
+        const email=req.body.email
+        const password=req.body.password
+        if(email=="" || password==""){
+            res.status(500).send('please fill all the details')
+        }
+        User.findOne({where: {email:email}})
+         .then(user=>{
+            console.log(user)
+            if(user){
+                if(user.dataValues.email==email && user.dataValues.password==password){
+                    res.json('user logged in succesfully!')
+                }
+                else{
+                    res.json('incorrect password')
+                }
+            }
+            else{
+
+                res.status(404).json('SORRY! user not found!')
+            }
+         })
+         
+    }
+    catch(err){
+        res.status(404).json('SORRY! user not found!')
+    }
+}
