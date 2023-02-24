@@ -4,6 +4,12 @@ const Expense=require('../model/expense')
 
 const bcrypt = require('bcrypt')
 
+const jwt=require('jsonwebtoken')
+
+function generateAccessToken(id){
+    return jwt.sign({userId:id},'secretkey')
+}
+
 exports.postUser = async (req, res, next) => {
     try {
         const { name, email, password } = req.body
@@ -40,7 +46,7 @@ exports.userLogin = async (req, res, next) => {
                     throw new Error('Something went wrong!')
                 }
                 if (response === true) {
-                    res.status(200).json({ success: true, message: "User logged in successfully" })
+                    res.status(200).json({ success: true, message: "User logged in successfully",token: generateAccessToken(user[0].id) })
                 }
                 else {
                     res.status(400).json({ success: true, message: "Password is incorrect" })
@@ -62,10 +68,12 @@ exports.addExpense=async (req,res,next)=>{
       if(expenseprice=="" || description=="" || typeofexpense==""){
         res.status(400).json({message: 'Please fill all the details'})
       }
+      console.log(req.user)
       const expdata=await Expense.create({
         expenseprice,
         description,
-        typeofexpense
+        typeofexpense,
+        userId:req.user.id
       })
       res.status(200).json(expdata)
 
@@ -78,8 +86,11 @@ exports.addExpense=async (req,res,next)=>{
 
 exports.getExpense=(req,res,next)=>{
     try{
-       Expense.findAll()
+        //req.user.getExpense().then.....
+        console.log(req.user.id)
+        Expense.findAll({where: {userId: req.user.id}})
         .then(expenses=>{
+            console.log(expenses)
             res.status(200).json(expenses)
         })
     }

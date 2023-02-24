@@ -14,8 +14,11 @@ async function userLogin(e){
         }
         console.log(my_obj)
 
-        const res=await axios.post('http://localhost:4000/user/login', my_obj)
-        window.location.href='./expense.html'
+        axios.post('http://localhost:4000/user/login', my_obj).then(response=>{
+            console.log(response.data)
+            localStorage.setItem('token',response.data.token)
+            window.location.href='./expense.html'
+        })
     }
     catch(err){
         console.log(err)

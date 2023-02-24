@@ -8,14 +8,15 @@ async function addExpense(e){
         const expenseprice=document.getElementById('expenseprice').value
         const description=document.getElementById('description').value
         const typeofexpense=document.getElementById('typeofexpense').value
-    
+        
+        const token=localStorage.getItem('token')
         let my_obj={
             expenseprice,
             description,
             typeofexpense
         }
     
-        const res=await axios.post('http://localhost:4000/expense/addexpense', my_obj)
+        const res=await axios.post('http://localhost:4000/expense/addexpense', my_obj, { headers: {"Authorization" : token} })
         console.log('add',res)
         showOnScreen(res.data)
 
@@ -37,7 +38,8 @@ function showOnScreen(data){
 
 window.addEventListener("DOMContentLoaded",async ()=>{
     try{
-        const res=await axios.get('http://localhost:4000/expense/getexpense')
+        const token=localStorage.getItem('token')
+        const res=await axios.get('http://localhost:4000/expense/getexpense', { headers: {"Authorization" : token} })
         for(let i=0;i<res.data.length;i++){
             showOnScreen(res.data[i])
         }
@@ -49,7 +51,8 @@ window.addEventListener("DOMContentLoaded",async ()=>{
 
 async function deleteExpense(id){
     try{
-       axios.delete(`http://localhost:4000/expense/deleteexpense/${id}`)
+        const token=localStorage.getItem('token')
+        axios.delete(`http://localhost:4000/expense/deleteexpense/${id}`, { headers: {"Authorization" : token} })
         .then(result=>removeExpenseFromScreen(id))
     }
     catch(err){
