@@ -1,3 +1,4 @@
+
 const form=document.querySelector('form')
 
 form.addEventListener('submit',addExpense)
@@ -39,6 +40,7 @@ function showOnScreen(data){
 window.addEventListener("DOMContentLoaded",async ()=>{
     try{
         const token=localStorage.getItem('token')
+        console.log(token)
         const res=await axios.get('http://localhost:4000/expense/getexpense', { headers: {"Authorization" : token} })
         for(let i=0;i<res.data.length;i++){
             showOnScreen(res.data[i])
@@ -71,3 +73,30 @@ function removeExpenseFromScreen(id){
     }
 }
 
+document.getElementById('rzp-button').onclick = async (e)=>{
+   
+      const token=localStorage.getItem('token')
+      const response=await axios.get('http://localhost:4000/purchase/premiummembership', { headers: {"Authorization" : token} })
+      console.log(response)
+      var options={
+        "key":response.data.keyid,
+        "order_id":response.data.order.id,
+        "handler": async function(response){
+           await axios.post('http://localhost:4000/purchase/updatetransactionstatus',{
+            order_id: options.order_id,
+            payment_id: response.razorpay_payment_id
+           },{ headers: {"Authorization" : token} })
+           document.getElementById('rzp-button').style.visibility = "hidden"
+           document.getElementById('message').innerHTML = "You are a premium user "
+           alert('you are a premium user now!')
+      },
+    };
+const rzp1 = new Razorpay(options)
+rzp1.open()
+e.preventDefault()
+
+rzp1.on('payment.failed',function (response){
+    console.log(err)
+    alert('Something went wrong!')
+})
+}
