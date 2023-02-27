@@ -37,10 +37,57 @@ function showOnScreen(data){
     items.innerHTML=items.innerHTML + childHTML
 }
 
+function showPremiumuserMessage() {
+    document.getElementById("rzp-button").style.visibility = "hidden";
+    document.getElementById("message").innerHTML = "You are a Premium user";
+}
+
+function parseJwt(token) {
+    var base64Url = token.split(".")[1];
+    var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    var jsonPayload = decodeURIComponent(
+        window
+        .atob(base64)
+        .split("")
+        .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+}
+
+function showLeaderBoard(){
+    const inputElement = document.createElement("input");
+    inputElement.type = "button";
+    inputElement.value = "Show Leaderboard";
+    const parent=document.getElementById('message')
+    inputElement.onclick = async () => {
+        const token = localStorage.getItem("token");
+        const userLeaderBoardArray = await axios.get(
+          "http://localhost:4000/premium/showLeaderBoard",
+          { headers: { Authorization: token } }
+        );
+        console.log(userLeaderBoardArray);
+        var leaderBoardElem = document.getElementById("leaderboard");
+        leaderBoardElem.innerHTML = "<h1> Leader Board </h1>";
+        userLeaderBoardArray.data.forEach((userDetails) => {
+          leaderBoardElem.innerHTML += `<li>Name - ${userDetails.name} Total Expense - ${userDetails.totalExpenses}  </li>`;
+        });
+    };
+    parent.appendChild(inputElement)
+}
+
+
 window.addEventListener("DOMContentLoaded",async ()=>{
     try{
         const token=localStorage.getItem('token')
-        console.log(token)
+        const decodeToken=parseJwt(token)
+        const ispremiumuser=decodeToken.ispremiumuser
+        if(ispremiumuser){
+            showPremiumuserMessage()
+            showLeaderBoard()
+        }
         const res=await axios.get('http://localhost:4000/expense/getexpense', { headers: {"Authorization" : token} })
         for(let i=0;i<res.data.length;i++){
             showOnScreen(res.data[i])
@@ -86,8 +133,7 @@ document.getElementById('rzp-button').onclick = async (e)=>{
             order_id: options.order_id,
             payment_id: response.razorpay_payment_id
            },{ headers: {"Authorization" : token} })
-           document.getElementById('rzp-button').style.visibility = "hidden"
-           document.getElementById('message').innerHTML = "You are a premium user "
+           showPremiumuserMessage()
            alert('you are a premium user now!')
       },
     };

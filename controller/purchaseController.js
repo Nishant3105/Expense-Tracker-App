@@ -46,7 +46,7 @@ exports.updateTransactionStatus=async (req,res,next)=>{
           return res.status(202).json({
             success: true,
             message: "Transaction Successful",
-            token: userController.generateAccessToken(userId),
+            token: userController.generateAccessToken(userId,undefined,true),
           });
         })
         .catch((error) => {
@@ -56,6 +56,6 @@ exports.updateTransactionStatus=async (req,res,next)=>{
       console.log(err);
       res
         .status(403)
-        .json({ errpr: JSON.stringify(err), message: "Something went wrong" });
+        .json({ error: JSON.stringify(err), message: "Something went wrong" });
     }
 }

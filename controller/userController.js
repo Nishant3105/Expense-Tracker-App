@@ -6,11 +6,11 @@ const bcrypt = require('bcrypt')
 
 const jwt=require('jsonwebtoken')
 
-exports.generateAccessToken=function(id){
-    return jwt.sign({userId:id},'secretkey')
+function generateAccessToken(id,name,ispremiumuser){
+    return jwt.sign({userId:id,username:name,ispremiumuser},'secretkey')
 }
 
-exports.postUser = async (req, res, next) => {
+const postUser = async (req, res, next) => {
     try {
         const { name, email, password } = req.body
         if (name == "" || email == "" || password == "") {
@@ -31,7 +31,7 @@ exports.postUser = async (req, res, next) => {
     }
 }
 
-exports.userLogin = async (req, res, next) => {
+const userLogin = async (req, res, next) => {
     try {
         const { email, password } = req.body
         console.log(email, password)
@@ -46,7 +46,11 @@ exports.userLogin = async (req, res, next) => {
                     throw new Error('Something went wrong!')
                 }
                 if (response === true) {
-                    res.status(200).json({ success: true, message: "User logged in successfully",token: generateAccessToken(user[0].id) })
+                    res.status(200).json({ 
+                        success: true, 
+                        message: "User logged in successfully",
+                        token: generateAccessToken(user[0].id,user[0].username,user[0].ispremiumuser) 
+                    })
                 }
                 else {
                     res.status(400).json({ success: true, message: "Password is incorrect" })
@@ -62,6 +66,10 @@ exports.userLogin = async (req, res, next) => {
     }
 }
 
+module.exports = {postUser,
+                 generateAccessToken,
+                 userLogin
+                }
 
   
   
