@@ -1,4 +1,5 @@
 const Expense=require('../model/expense')
+const User=require('../model/user')
 
 exports.addExpense=async (req,res,next)=>{
     try{
@@ -13,14 +14,24 @@ exports.addExpense=async (req,res,next)=>{
         typeofexpense,
         userId:req.user.id
       })
-      res.status(200).json(expdata)
-
-    }
-    catch(err){
-        console.log(err)
-        res.status(500).json({success: false})
-    }
+        const totalExpense = Number(req.user.totalexpense) + Number(expenseprice)
+        User.update({
+            totalexpense:totalExpense
+          },{
+            where:{id:req.user.id}
+          })
+          .then(result=>{
+              res.status(200).json(expdata)
+            })
+        
+        }
+      catch(err){
+          console.log(err)
+          res.status(500).json({success: false})
+      }
+     
 }
+
 
 exports.getExpense=(req,res,next)=>{
     try{
@@ -28,7 +39,6 @@ exports.getExpense=(req,res,next)=>{
         console.log(req.user.id)
         Expense.findAll({where: {userId: req.user.id}})
         .then(expenses=>{
-            console.log(expenses)
             res.status(200).json(expenses)
         })
     }
@@ -37,13 +47,24 @@ exports.getExpense=(req,res,next)=>{
     }
 }
 
-exports.deleteExpense=(req,res,next)=>{
+exports.deleteExpense=async (req,res,next)=>{
     try{
         const id=req.params.id
-        Expense.destroy({where:{id}})
-        .then(result=>{
-            res.json({message: 'expense deleted successfully!'})
-        })
+        const expense=await Expense.findAll({where:{id}})
+        const expamt=expense[0].expenseprice
+        console.log(expamt)
+        const response=await Expense.destroy({where:{id}})
+        if(response==true){
+            const totalExpense = Number(req.user.totalexpense) - Number(expamt)
+            User.update({
+                totalexpense:totalExpense
+              },{
+                where:{id:req.user.id}
+              })
+              .then(result=>{
+                  res.json({message: 'expense deleted successfully!'})
+              })
+        }
     }
     catch(err){
         console.log(err)

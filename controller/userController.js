@@ -20,7 +20,8 @@ const postUser = async (req, res, next) => {
             await User.create({
                 username: name,
                 email,
-                password: hash
+                password: hash,
+                totalexpense: 0
             })
 
             res.status(201).json({ message: 'Successfully created new user' })

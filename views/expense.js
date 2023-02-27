@@ -72,7 +72,7 @@ function showLeaderBoard(){
         var leaderBoardElem = document.getElementById("leaderboard");
         leaderBoardElem.innerHTML = "<h1> Leader Board </h1>";
         userLeaderBoardArray.data.forEach((userDetails) => {
-          leaderBoardElem.innerHTML += `<li>Name - ${userDetails.name} Total Expense - ${userDetails.totalExpenses}  </li>`;
+          leaderBoardElem.innerHTML += `<li>Name - ${userDetails.name} Total Expense - ${userDetails.total_cost}  </li>`;
         });
     };
     parent.appendChild(inputElement)
