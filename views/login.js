@@ -1,6 +1,8 @@
 const form=document.querySelector('form')
+const forgetPassword=document.querySelector('#fp')
 
 form.addEventListener('submit',userLogin)
+forgetPassword.addEventListener('click',resetPassword)
 
 async function userLogin(e){
     try{
@@ -24,4 +26,8 @@ async function userLogin(e){
         console.log(err)
     }
     
+}
+
+function resetPassword(){
+   window.location.href='./forgotPassword.html'
 }

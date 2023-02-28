@@ -12,10 +12,12 @@ const userroutes = require('./routes/userRoutes')
 const exproutes = require('./routes/expenseRoutes')
 const purchaseroutes = require('./routes/purchaseRoutes')
 const premiumroutes = require('./routes/premiumRoutes')
+const fproutes = require('./routes/forgotpassword')
 
 const Expense=require('./model/expense')
 const User=require('./model/user')
 const Order=require('./model/order')
+const Forgotpassword=require('./model/forgotpassword')
 
 const app = express()
 const dotenv = require("dotenv")
@@ -36,11 +38,16 @@ app.use(purchaseroutes)
 
 app.use(premiumroutes)
 
+app.use(fproutes)
+
 User.hasMany(Expense)
 Expense.belongsTo(User)
 
 User.hasMany(Order)
 Order.belongsTo(User)
+
+User.hasMany(Forgotpassword);
+Forgotpassword.belongsTo(User);
 
 sequelize
     .sync()
