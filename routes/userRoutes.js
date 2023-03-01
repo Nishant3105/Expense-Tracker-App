@@ -10,5 +10,7 @@ routes.post('/user/signup',userController.postUser)
 
 routes.post('/user/login',userController.userLogin)
 
+routes.get('/user/download', userAuthentication.authenticate, userController.)
+
 
 module.exports = routes

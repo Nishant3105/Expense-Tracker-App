@@ -146,3 +146,21 @@ rzp1.on('payment.failed',function (response){
     alert('Something went wrong!')
 })
 }
+
+function download(){
+        axios.get('http://localhost:4000/user/download', { headers: {"Authorization" : token} })
+        .then((response) => {
+            if(response.status === 200){
+                var a = document.createElement("a");
+                a.href = response.data.fileUrl;
+                a.download = 'myexpense.csv';
+                a.click();
+            } else {
+                throw new Error(response.data.message)
+            }
+    
+        })
+        .catch((err) => {
+            showError(err)
+        });
+    }

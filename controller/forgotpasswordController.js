@@ -52,7 +52,6 @@ exports.forgotpassword = async (req, res) => {
           throw new Error(err);
         });
 
-      // send mail
     } else {
       throw new Error("User doesnt exist");
     }
