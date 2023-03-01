@@ -12,4 +12,5 @@ expenseRoutes.get('/expense/getexpense', userAuthentication.authenticate , expen
 
 expenseRoutes.delete('/expense/deleteexpense/:id', userAuthentication.authenticate, expenseController.deleteExpense)
 
+
 module.exports = expenseRoutes

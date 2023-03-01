@@ -1,6 +1,26 @@
 const Expense = require('../model/expense')
 const User = require('../model/user')
 const sequelize = require('../util/database')
+const UserServices=require('../services/userservices')
+const S3Service=require('../services/s3services')
+
+exports.downloadexpense = async (req, res) => {
+    try {
+      console.log('reached here')
+      const expenses = await UserServices.getExpenses(req); // here expenses are array
+      console.log(expenses);
+      const stringifiedExpenses = JSON.stringify(expenses);
+      const userId = req.user.id;
+      //res.status(200).json({fileURL,success: true})
+      const filename = `Expense${userId}/${new Date()}.txt`;
+      const fileURL = await S3Service.uploadToS3(stringifiedExpenses, filename);
+      res.status(200).json({ fileURL, success: true });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ fileURL: "", success: false, error: err });
+    }
+  };
+
 
 exports.addExpense = async (req, res, next) => {
     try {
