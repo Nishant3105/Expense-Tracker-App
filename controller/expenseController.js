@@ -1,11 +1,13 @@
 const Expense = require('../model/expense')
 const User = require('../model/user')
 const sequelize = require('../util/database')
+const FilesDownloaded=require('../model/filedownloaded')
 const UserServices=require('../services/userservices')
 const S3Service=require('../services/s3services')
 
 exports.downloadexpense = async (req, res) => {
     try {
+      const t = await sequelize.transaction()
       console.log('reached here')
       const expenses = await UserServices.getExpenses(req); // here expenses are array
       console.log(expenses);
@@ -14,17 +16,24 @@ exports.downloadexpense = async (req, res) => {
       //res.status(200).json({fileURL,success: true})
       const filename = `Expense${userId}/${new Date()}.txt`;
       const fileURL = await S3Service.uploadToS3(stringifiedExpenses, filename);
-      res.status(200).json({ fileURL, success: true });
+      await FilesDownloaded.create({
+        fileUrl:fileURL,
+        userId,
+      },
+      )
+      const downloadedFiles=await FilesDownloaded.findAll({attributes:['fileUrl','createdAt'],where: {userId:userId}})
+      res.status(200).json({ fileURL, downloadedFiles, success: true });
     } catch (err) {
       console.log(err);
+      t.rollback()
       res.status(500).json({ fileURL: "", success: false, error: err });
     }
   };
 
 
 exports.addExpense = async (req, res, next) => {
+    //const t = await sequelize.transaction()
     try {
-        const t = await sequelize.transaction()
         const { expenseprice, description, typeofexpense } = req.body
         if (expenseprice == "" || description == "" || typeofexpense == "") {
             res.status(400).json({ message: 'Please fill all the details' })
@@ -36,20 +45,23 @@ exports.addExpense = async (req, res, next) => {
             typeofexpense,
             userId: req.user.id
         },
-            { transaction: t })
+            //{ transaction: t }
+        )
         const totalExpense = Number(req.user.totalexpense) + Number(expenseprice)
         await User.update({
             totalexpense: totalExpense
         }, {
             where: { id: req.user.id }
-        }, { transaction: t })
-        await t.commit()
+        }, 
+        //{ transaction: t }
+        )
+        //await t.commit()
         res.status(200).json(expdata)
 
     }
     catch (err) {
         console.log(err)
-        await t.rollback()
+        //await t.rollback()
         res.status(500).json({ success: false })
     }
 
@@ -71,13 +83,17 @@ exports.getExpense = (req, res, next) => {
 }
 
 exports.deleteExpense = async (req, res, next) => {
+    //const t = await sequelize.transaction()
     try {
-        const t = await sequelize.transaction()
         const id = req.params.id
-        const expense = await Expense.findAll({ where: { id } }, { transaction: t })
+        const expense = await Expense.findAll({ where: { id } }, 
+            //{ transaction: t }
+            )
         const expamt = expense[0].expenseprice
         console.log(expamt)
-        const response = await Expense.destroy({ where: { id } }, { transaction: t })
+        const response = await Expense.destroy({ where: { id } }, 
+            //{ transaction: t }
+            )
         if (response == true) {
             const totalExpense = Number(req.user.totalexpense) - Number(expamt)
             await User.update({
@@ -85,14 +101,15 @@ exports.deleteExpense = async (req, res, next) => {
             }, {
                 where: { id: req.user.id }
             },
-                { transaction: t })
-            await t.commit()
+                //{ transaction: t }
+            )
+            //await t.commit()
             res.json({ message: 'expense deleted successfully!' })
         }
     }
     catch (err) {
         console.log(err)
-        await t.rollback()
+        //await t.rollback()
         res.status(500).json({ message: 'Something went wrong' })
     }
 }

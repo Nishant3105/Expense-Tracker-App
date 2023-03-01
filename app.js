@@ -18,6 +18,7 @@ const Expense=require('./model/expense')
 const User=require('./model/user')
 const Order=require('./model/order')
 const Forgotpassword=require('./model/forgotpassword')
+const FilesDownloaded=require('./model/filedownloaded')
 
 const app = express()
 const dotenv = require("dotenv")
@@ -39,6 +40,9 @@ app.use(purchaseroutes)
 app.use(premiumroutes)
 
 app.use(fproutes)
+
+User.hasMany(FilesDownloaded)
+FilesDownloaded.belongsTo(User)
 
 User.hasMany(Expense)
 Expense.belongsTo(User)

@@ -72,7 +72,7 @@ function showLeaderBoard(){
         var leaderBoardElem = document.getElementById("leaderboard");
         leaderBoardElem.innerHTML = "<h1> Leader Board </h1>";
         userLeaderBoardArray.data.forEach((userDetails) => {
-          leaderBoardElem.innerHTML += `<li>Name - ${userDetails.name} Total Expense - ${userDetails.total_cost}  </li>`;
+          leaderBoardElem.innerHTML += `<li>Name - ${userDetails.username} Total Expense - ${userDetails.total_cost}  </li>`;
         });
     };
     parent.appendChild(inputElement)
@@ -156,12 +156,17 @@ function download(){
                 a.href = response.data.fileURL;
                 a.download = 'myexpense.csv';
                 a.click();
+                var alldownloadedfiles = document.getElementById("alldownloadedfiles");
+                alldownloadedfiles.innerHTML = "<h1> All Downloaded Files </h1>";
+                response.data.downloadedFiles.forEach((downloadedfile) => {
+                alldownloadedfiles.innerHTML += `<li>Link - ${downloadedfile.fileUrl}  - Created At ${downloadedfile.createdAt}  </li>`;
+        });
             } else {
                 throw new Error(response.data.message)
             }
     
         })
         .catch((err) => {
-            showError(err)
+            console.log(err)
         });
     }
