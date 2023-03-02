@@ -27,13 +27,22 @@
             <button class="btn btn-primary mb-2">Submit</button>
         </form>
     </div>
-    <ul id="items"></ul>
     <div id="message">
         <button id="rzp-button">Buy Premium</button>
     </div>
-    <ul id="leaderboard"></ul>
-    <button onclick="download()" id="downloadexpense">Download File</button>
+    <button onclick="download()" id="downloadexpense">Download File</button><br><br>
+    <div class="text-right">
+        <select id="select" class="form-select" aria-label="Default select example">
+        <option selected>Select no. of expenses</option>
+        <option value="2">2</option>
+        <option value="5">5</option>
+        <option value="10">10</option>
+    </select>
+    </div>
+    <ul id="items"></ul>
+    <div class="text-center" id="pagination"></div>
     <ul id="alldownloadedfiles"></ul>
+    <ul id="leaderboard"></ul>
     
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.3/axios.min.js"></script>

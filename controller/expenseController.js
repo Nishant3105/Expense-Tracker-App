@@ -71,14 +71,24 @@ exports.addExpense = async (req, res, next) => {
 exports.getExpense = (req, res, next) => {
     try {
         //req.user.getExpense().then.....
-        console.log(req.user.id)
-        Expense.findAll({ where: { userId: req.user.id } })
-            .then(expenses => {
-                res.status(200).json(expenses)
+        const uId=req.user.id
+        console.log(req.query)
+        const limit=req.query.limit ? parseInt(req.query.limit) : 2
+        const page=req.query.page ? parseInt(req.query.page) : 1
+        Expense.findAndCountAll({ where: { userId: uId } })
+            .then(data => {
+                const pages=Math.ceil(data.count / limit)
+                req.user.getExpenses({attributes:['expenseprice','description','typeofexpense'],offset: (page-1) * limit, limit:limit})
+                .then((expense)=>{
+                    console.log(expense)
+                    res.status(200).json({expense, pages:pages})
+                })
+                .catch((err)=>console.log(err))
             })
+            .catch((err)=>console.log(err))
     }
     catch (err) {
-        res.status(404).json({ message: 'No response to display' })
+        res.status(500).json({ error: err ,success: false })
     }
 }
 

@@ -78,25 +78,60 @@ function showLeaderBoard(){
     parent.appendChild(inputElement)
 }
 
-
-window.addEventListener("DOMContentLoaded",async ()=>{
+async function getExpenses(){
     try{
         const token=localStorage.getItem('token')
+        const select=localStorage.getItem('select')
         const decodeToken=parseJwt(token)
         const ispremiumuser=decodeToken.ispremiumuser
         if(ispremiumuser){
             showPremiumuserMessage()
             showLeaderBoard()
         }
-        const res=await axios.get('http://localhost:4000/expense/getexpense', { headers: {"Authorization" : token} })
-        for(let i=0;i<res.data.length;i++){
-            showOnScreen(res.data[i])
+        const res=await axios.get(`http://localhost:4000/expense/getexpense?limit=${select}`, { headers: {"Authorization" : token} })
+        console.log(res)
+        createpagination(res.data.pages);
+        for(let i=0;i<res.data.expense.length;i++){
+            showOnScreen(res.data.expense[i])
         }
     }
     catch(err){
         console.log(err)
     }
-})
+}
+
+function createpagination(pages) {
+    document.querySelector("#pagination").innerHTML = "";
+    let childhtml = "";
+    for (var i = 1; i <= pages; i++) {
+      childhtml += `<a class="mx-2" id="page=${i}" >${i}</a>`;
+    }
+    const parentnode = document.querySelector("#pagination");
+    parentnode.innerHTML = parentnode.innerHTML + childhtml;
+}
+
+document.querySelector("#pagination").addEventListener("click", getexpensepage);
+async function getexpensepage(e) {
+  //alert(e.target.id)
+  const parentnode = document.querySelector("#items");
+  //    const select=localStorage.getItem('select');
+  parentnode.innerHTML = "";
+  // const limit=`${select}?'&limit='${select}`;
+  const token = localStorage.getItem("token");
+  try {
+    let response = await axios.get(
+      `http://localhost:4000/expense/getexpense?${e.target.id}`,
+      { headers: { Authorization: token } }
+    );
+    for (let i = 0; i < response.data.expense.length; i++) {
+        showOnScreen(response.data.expense[i]);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+window.addEventListener("DOMContentLoaded",getExpenses)
 
 async function deleteExpense(id){
     try{
@@ -119,6 +154,11 @@ function removeExpenseFromScreen(id){
         console.log(err)
     }
 }
+
+document.querySelector('#select').addEventListener('change',(e)=>{
+    localStorage.setItem('select',e.target.value)
+    getExpenses()
+})
 
 document.getElementById('rzp-button').onclick = async (e)=>{
    
