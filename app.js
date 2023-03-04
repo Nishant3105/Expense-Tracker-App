@@ -8,6 +8,9 @@ const compression = require('compression')
 
 const jwt=require('jsonwebtoken')
 
+const dotenv = require("dotenv")
+
+dotenv.config();
 
 const sequelize = require('./util/database')
 
@@ -24,9 +27,6 @@ const Forgotpassword=require('./model/forgotpassword')
 const FilesDownloaded=require('./model/filedownloaded')
 
 const app = express()
-const dotenv = require("dotenv")
-
-dotenv.config();
 
 const accessLogStream = fs.createWriteStream(('access.log'),{flag : 'a'})
 
